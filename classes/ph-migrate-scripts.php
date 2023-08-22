@@ -21,73 +21,10 @@ class PH_Migrate_Scripts
 
         add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
 
-        // add_action( 'wp_ajax_ph_migrate_button', array( $this, 'getFreemiusData' ) );
-        // add_action( 'wp_ajax_nopriv_ph_migrate_button', array( $this, 'getFreemiusData' ) );
-
-        // add_action( 'wp_ajax_ph_migrate_button', array( $this, 'getTestData' ) );
-        // add_action( 'wp_ajax_nopriv_ph_migrate_button', array( $this, 'getTestData' ) );
-
-        // add_action( 'rest_api_init', array( $this, 'ph_migration_register_webhook_endpoint' ) );
+        add_action( 'wp_ajax_ph_migrate_button', array( $this, 'getFreemiusData' ) );
+        add_action( 'wp_ajax_nopriv_ph_migrate_button', array( $this, 'getFreemiusData' ) );
 
 	}
-
-    public function ph_migration_register_webhook_endpoint() {
-
-        register_rest_route( 'ph-migration/v1', '/webhook', array(
-            'methods' => 'GET',
-            'callback' => array( $this, 'ph_migration_handle_webhook' ),
-        ));
-
-    }
-
-    public function ph_migration_handle_webhook( $request ) {
-
-        $data = $request->get_json_params(); // Received JSON data from Freemius
-
-        // $webhookURL = "https://webhook.suretriggers.com/suretriggers/bf263436-3dd4-11ee-a01f-662f04b50926";
-
-        // print_r( $data );
-
-        // Send the POST request to the webhook using wp_remote_post
-        // $webhook_response = wp_remote_post( $webhookURL, array(
-        //     "body" => $data,
-        // ));
-
-        // print_r( $webhook_response );
-        
-        if ( isset($data['type']) && $data['type'] === 'payment.created' ) {
-
-            // Handle the renewal payment event
-            // You can extract necessary information from $data and process it.
-                // $user_id = isset($data['user_id']) ? $data['user_id'] : '';
-
-                // $api = $this->getFreemiusApi();        
-        
-                // $store_id = $this->_get_store_id( $api );
-
-                // $user_data = $this->_find_user_by_email( $api, $store_id, $user_id );
-
-                // $user_email = isset( $user_data['email'] ) ? $user_data['email'] : '';
-
-            // Write logic to find if a user exists with the email address.
-            $user_email = $data->objects->user->email;
-
-            $amount = $data->objects->payment->gross;
-
-            $is_renewal = $data->objects->payment->is_renewal;
-
-            $is_renewal = $is_renewal ? 'Yes' : 'No';
-
-        }
-    
-        // Include the received data in the response
-        $response_data = array(
-            'message' => 'Webhook received.',
-            'data' => $data // Include the received data here
-        );
-
-        return new WP_REST_Response( $response_data, 200 );
-    }
 	
 	/**
      * Function that loads scripts
@@ -127,18 +64,6 @@ class PH_Migrate_Scripts
         return $api;
     }
 
-    public function getTestData() {
-        check_ajax_referer( 'ph_migrate_nonce', 'nonce' );
-
-        $arguments = isset( $_POST['data'] ) ? $_POST['data'] : [];
-
-        $url = add_query_arg( $arguments, 'https://projecthuddle.local/wp-json/ph-migrate-rest/v1/webhook/' ); // add URL of your site or mail API.
-
-        $response = wp_remote_post( $url, [ 'timeout' => 60 ] );
-
-        wp_send_json( $response );
-    }
-
     public function getFreemiusData() {
 
         check_ajax_referer( 'ph_migrate_nonce', 'nonce' );
@@ -147,6 +72,14 @@ class PH_Migrate_Scripts
         $response  = array();
         $data      = array();
         $plugin_id = '5368';
+
+        $pricing_ids = array(
+            '8618' => 'd17b50b9-1d84-4c01-a70f-038346f149cd', // 99 USD
+            '18423' => '9abbe0b4-abb5-431f-a914-0e3255c2b411', // 149 USD
+            '18424' => '6a81fc9b-2bf0-4761-9d3f-0456397760a5', // 599 USD
+        );
+
+        
 
         // if ( isset( $_POST['data'] ) ) {
 

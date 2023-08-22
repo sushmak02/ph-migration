@@ -43,7 +43,7 @@ if ( ! class_exists( 'PH_Migration_Rest_API' ) ) :
 		 * @since 1.0.0
 		 */
 		public function __construct() {
-			add_action( 'rest_api_init', array( $this, 'add_subscription' ) );
+			add_action( 'rest_api_init', array( $this, 'addPhWebhook' ) );
 		}
 
 		/**
@@ -51,14 +51,14 @@ if ( ! class_exists( 'PH_Migration_Rest_API' ) ) :
 		 *
 		 * @return void
 		 */
-		function add_subscription() {
+		function addPhWebhook() {
 			register_rest_route(
 				'ph-migrate-rest/v1',
 				'/webhook',
 				array(
 					array(
 						'methods'             => 'POST, GET',
-						'callback'            => array( $this, 'subscribe' ),
+						'callback'            => array( $this, 'getFreemiusData' ),
 						'permission_callback' => '__return_true',
 					),
 				)
@@ -71,29 +71,31 @@ if ( ! class_exists( 'PH_Migration_Rest_API' ) ) :
 		 * @param array $request Request Rest API Params.
 		 * @return array
 		 */
-		function subscribe( $request ) {
+		function getFreemiusData( $request ) {
 
 			$data = $request->get_params(); // Received JSON data from Freemius
 
-			// error_log( print_r( $data, true ) );
+			// $data = $request->get_json_params(); // Received JSON data from Freemius
 
-			$data_array = array(
-				'name' => ( isset( $data['name'] ) && ! empty( $data['name'] ) ) ? sanitize_text_field( $data['name'] ) : 'Tester',
-			);
+			if ( isset($data['type']) && $data['type'] === 'payment.created' ) {
 
-			$webhookURL = "https://webhook.suretriggers.com/suretriggers/8e3609b8-40ce-11ee-a01f-662f04b50926";
+				// Handle the renewal payment event	
+				// Write logic to find if a user exists with the email address.
+				$user_email = $data->objects->user->email;
+	
+				$amount = $data->objects->payment->gross;
+	
+				$is_renewal = $data->objects->payment->is_renewal;
+	
+				$is_renewal = $is_renewal ? 'Yes' : 'No';
+	
+			}
 
-			// Send the POST request to the webhook using wp_remote_post
-			$webhook_response = wp_remote_post( $webhookURL, array(
-			    "body" => $data_array
-			));
-
+			// Include the received data in the response
 			$response_data = array(
 				'message' => 'Webhook received.',
 				'data' => $data // Include the received data here
 			);
-
-			error_log( print_r( $data, true ));
 	
 			return new WP_REST_Response( $response_data, 200 );
 

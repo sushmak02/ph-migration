@@ -10,8 +10,8 @@
                 event.preventDefault();
 
                 var data = {
-                    'email'  : "dummy@bsf.io",
-                    'name'   : "Dummy",
+                    'email'  : "dummytest@bsf.io",
+                    'name'   : "DummyTest",
                 };
 
                 // var redirect_url = "https://projecthuddle.com";

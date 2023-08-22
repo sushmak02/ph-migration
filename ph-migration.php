@@ -92,7 +92,7 @@ if (!class_exists('PH_Migration')) {
 		 */
 		private function includes()
 		{
-            error_log( PH_MIGRATE_PLUGIN_DIR );
+			
             require_once PH_MIGRATE_PLUGIN_DIR . '/freemius/start.php';
 
             if ( ! class_exists( 'Freemius_Api_WordPress' ) ) {
@@ -101,111 +101,6 @@ if (!class_exists('PH_Migration')) {
 
             require_once PH_MIGRATE_PLUGIN_DIR . '/classes/ph-migrate-scripts.php';
             require_once PH_MIGRATE_PLUGIN_DIR . '/classes/ph-migrate-rest-api.php';
-            
-            // $freemius_data = $this->getFreemiusData();
-
-            // error_log( print_r( $freemius_data, true ) );
-
-        }
-
-        public function getFreemiusData() {
-
-            $result = [];
-
-            $email = 'sushmatest@gmail.com';
-        
-			$api = new Freemius_Api_WordPress( PH_ACCESS_TYPE, PH_DEV_ID, PH_DEV_PUBLIC_KEY, PH_DEV_SECRET_KEY );
-
-
-            $store_id = $this->_get_store_id( $api );
-
-			if( ! $store_id ) {
-                return;
-            }
-
-			$result = $api->Api("plugins/5368/events/1092009868.json");
-
-        
-            $user_data = $this->_find_user_by_email( $api, $store_id, '7351921' );
-
-            $user_email = isset( $user_data['email'] ) ? $user_data['email'] : '';
-
-			// $user_id = isset( $result['user']['id'] ) ? $result['user']['id'] : '';
-
-			// if( ! $user_id ) {
-            //     return;
-            // }
-
-			// $activations = $api->Api("plugins/5368/installs.json?user_id=7314373");
-
-            error_log( print_r( $user_email, true ) );
-            // error_log( "===== ");
-
-        
-            // $result['licenses'] = $this->_find_license_by_user( $api, $store_id, $user_id );
-
-            // $result['billing'] = $this->_find_billing_details( $api, $store_id, $user_id );
-        
-            return $result;
-
-			
-        }
-        
-        public function _get_store_id( $api ) {
-            $result = $api->Api("dashboard.json?format=json");
-            if( ! isset( $result->stores[0] ) ) {
-                return false;
-            }
-            return $result->stores[0]->id;
-        }
-        
-        public function _find_user_by_email( $api, $store_id, $email_id ) {
-
-			$users = $api->Api("stores/{$store_id}/users.json?format=json&search={$email_id}");
-			
-			if ( empty($users->users) ) {
-				// No users found with the provided email
-				error_log("No users found with email: $email_id");
-				return ['error' => "No users found with the provided email"];
-			}
-		
-			$user = isset($users->users[0]) ? get_object_vars($users->users[0]) : [];
-			
-			return $user;			
-            
-        }
-        
-        public function _find_license_by_user( $api, $store_id, $user_id ) {
-
-			$licenseResponse = $api->Api("stores/{$store_id}/users/{$user_id}/licenses.json?format=json&count=100");
-
-			if (isset($licenseResponse->error)) {
-				$errorMessage = $licenseResponse->error->message;
-				$errorCode = $licenseResponse->error->code;
-
-				// Return an appropriate response or error data
-				return ['error' => $errorMessage];
-			}
-
-			// Process the licenses data
-			return $licenseResponse;
-            
-        }
-
-		public function _find_billing_details( $api, $store_id, $user_id ) {  
-			
-			$billingResponse = $api->Api("stores/{$store_id}/users/{$user_id}/billing.json?format=json&count=100");
-
-			if (isset($billingResponse->error)) {
-				$errorMessage = $billingResponse->error->message;
-				$errorCode = $billingResponse->error->code;
-
-				// Return an appropriate response or error data
-				return ['error' => $errorMessage];
-			}
-
-			// Process the licenses data
-			return $billingResponse;
 
         }
 
