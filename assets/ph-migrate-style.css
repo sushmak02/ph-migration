@@ -1,0 +1,38 @@
+.ph-migrate-loader {
+    width: 1em;
+    height: 1em;
+    margin-left: 1em;
+    border: 2px solid currentColor;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    border-left-color: transparent;
+}
+.ph-migrate-loader {
+    -webkit-animation: ph-rotating 1s linear infinite;
+    animation: ph-rotating 1s linear infinite;
+}
+
+
+@-webkit-keyframes ph-rotating /* Safari and Chrome */ {
+    from {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+@keyframes ph-rotating {
+    from {
+        -webkit-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
